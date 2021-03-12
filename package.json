@@ -2,7 +2,7 @@
   "name": "boftp",
   "displayName": "boFTP",
   "description": "Transfert ftp d'élément",
-  "version": "0.0.1",
+  "version": "0.0.2",
 	"publisher": "ITCE-MathieuFay",
   "engines": {
     "vscode": "^1.54.0"
@@ -11,7 +11,8 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:boftp.transfertFTP"
+    "onCommand:boftp.transfertFTP" ,
+    "onCommand:boftp.testFTP"
   ],
   "main": "./extension.js",
   "contributes": {
@@ -19,6 +20,10 @@
       {
         "command": "boftp.transfertFTP",
         "title": "boFTP-Transfert de fichier"
+      } ,
+      {
+        "command": "boftp.testFTP",
+        "title": "boFTP-Validation accès FTP"
       }
     ],
 		"menus": {
@@ -26,6 +31,17 @@
 				"command": "boftp.transfertFTP",
 				"group": "0_FTP@1"
 			} ]
+		}
+		,
+		"configuration": {
+			"title": "boFTP",
+			"properties": {
+			  	"boFTP.CompteRenduText": {
+					"type": "boolean",
+					"default": false,
+					"description": "Récupération du compte-rendu sur un onglet à part."
+			  	}
+			}
 		}
   },
   "scripts": {
