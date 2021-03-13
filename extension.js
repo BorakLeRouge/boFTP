@@ -6,6 +6,7 @@ const path   = require('path') ;
 const fs     = require('fs') ;
 const yaml   = require('js-yaml') ;	
 const os     = require('os') ;  
+const { cpuUsage } = require('node:process');
   
 // ==============================
 //    CCC   L       OOO    GGGG
@@ -99,7 +100,19 @@ let moduleFTP = async function(mode='trsf') {
 	// * * * Ouverture du fichier YAML * * *
 	let fiYamlCont = fs.readFileSync(fiYaml, 'utf8') ;
 	let connexionList = yaml.safeLoad(fiYamlCont) ; 
-	let connex = connexionList.connexions[0] ;
+	let connActif = connexionList.actif ; clog(connActif) ;
+	if (connActif == undefined) {
+		vscode.window.showErrorMessage('boFTP - manque le paramètre "actif" dans le fichier "boFTP.yaml" !');
+		clog('connActif undefined') ;
+		return ;
+	}
+	let connex = connexionList.connexions[connActif] ;
+	if (connex == undefined || connex.adresse == undefined 
+		|| connex.user == undefined || connex.dossier == undefined) {
+		vscode.window.showErrorMessage('boFTP - fichier "boFTP.yaml" non conforme !');
+		clog('connex', connex) ;
+		return ;
+	}
 	//clog('connex', connex) ;
 
 	// * * * Paramètre fichier * * *
