@@ -75,7 +75,7 @@ let moduleFTP = async function(mode='trsf') {
 	let nomFich     = path.basename(adrFich) ; 
 	let dirFich     = path.dirname(adrFich) ;
 
-	// * * * Recherche du fichier YAML * * *
+	// * * * Recherche du fichier YAML et alim sous-dossier ftp * * *
 	let fi     = dirFich ;
 	let fp     = '' ;
 	let fiYaml = '' ;
@@ -89,7 +89,8 @@ let moduleFTP = async function(mode='trsf') {
 			fi = path.dirname(fi) ;
 		}
 	}
-
+	dossierFtp = dossierFtp.replace(/\\/g, "/") ;
+	// controle présence YAML
 	if (fiYaml == '') {
 		vscode.window.showErrorMessage('boFTP - désolé : fichier "boFTP.yaml" non trouvé !');
 		clog('Yaml non trouvé !') ;
@@ -99,8 +100,19 @@ let moduleFTP = async function(mode='trsf') {
 	// * * * Ouverture du fichier YAML * * *
 	let fiYamlCont = fs.readFileSync(fiYaml, 'utf8') ;
 	let connexionList = yaml.safeLoad(fiYamlCont) ; 
-	let connex = connexionList.connexions[0] ;
-	//clog('connex', connex) ;
+	let connActif = connexionList.actif ; clog(connActif) ;
+	if (connActif == undefined) {
+		vscode.window.showErrorMessage('boFTP - manque le paramètre "actif" dans le fichier "boFTP.yaml" !');
+		clog('connActif undefined') ;
+		return ;
+	}
+	let connex = connexionList.connexions[connActif] ;
+	if (connex == undefined || connex.adresse == undefined || connex.user == undefined || connex.dossier == undefined) {
+		vscode.window.showErrorMessage('boFTP - fichier "boFTP.yaml" non conforme !');
+		clog('connex', connex) ;
+		return ;
+	}
+	clog('connex', connex) ;
 
 	// * * * Paramètre fichier * * *
 	let tmpFTP     = path.join(os.tmpdir(),'cmdftp.prm') ; 
@@ -125,6 +137,7 @@ let moduleFTP = async function(mode='trsf') {
 		cmdFTP +=
 		 	  "ls \n" ;
 	}
+    cmdFTP += "pwd \n" ; 	
     cmdFTP += "bye "; 		
 
 	fs.writeFileSync(tmpFTP, cmdFTP) ;
