@@ -31,6 +31,10 @@ connexions:
 
 ## Release Notes
 
+### 0.0.4
+
+Gestion du mot de passe
+
 ### 0.0.3
 
 YAML multicible.
