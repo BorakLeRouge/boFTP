@@ -175,6 +175,53 @@ let affichageWeb = async function(contenu, cmd) {
 		panel.webview.html = '<pre>'+cmd+"\n\r\n\r"+contenu+'</pre>' ;
 }
   
+  
+// ===============================================================
+//   EEEEE  N   N  V   V   OOO   IIIII       FFFFF  TTTTT  PPPP
+//   E      NN  N  V   V  O   O    I         F        T    P   P
+//   EEEE   N N N  V   V  O   O    I         FFFF     T    PPPP
+//   E      N  NN   V V   O   O    I         F        T    P
+//   EEEEE  N   N    V     OOO   IIIII       F        T    P
+// ===============================================================
+// module d'envoi de la commande FTP present dans un fichier 
+let envoiFTP = function(cmdFTP, password, mode, visuCR) {
+
+
+	// * * * Paramètre fichier * * *
+	let fichierCmdFTP = path.join(os.tmpdir(),'cmdftp.prm') ; 
+	
+	let cmd ;
+	if (os.platform().substr(0,3) == 'win') {
+		// * * * Version Windows * * *
+		cmd =  'FTP -n -s:"' + fichierCmdFTP + '"' ; 
+		fichierCmdFTP.replace(/\n/g, "\r\n")
+		fs.writeFileSync(fichierCmdFTP, cmdFTP) ;
+	} else {
+		// * * * Version Macintosh (ou Unix) * * *
+		cmd = "cat '" + fichierCmdFTP + "' | ftp -nv" ; 
+		fichierCmdFTP.replace(/\r\n/g, "\n")
+		fs.writeFileSync(fichierCmdFTP, cmdFTP) ;
+	}
+
+	let cmdResult ;
+	try {
+		cmdResult = require('child_process').execSync(cmd).toString() ;
+		let res = cmdResult.replace(/\n/g, "\r\n").replace(password, "********") ;
+		if (mode == 'test' || visuCR ) {
+			affichageWeb(res, fichierCmdFTP.replace(/\n/g, "\r\n").replace(password, "********")) ;
+		} else {
+		//clog(res) ;
+		vscode.window.showInformationMessage(res);
+		}
+	} catch (err) {
+		vscode.window.showErrorMessage('IT-CE : Problème de transfert FTP ! '+cmdResult);
+		clog('err', err) ;
+		return  false ;
+	}	
+
+	return  true ;	
+}
+
 // ======================================================================
 //   M   M   OOO   DDDD   U   U  L      EEEEE       FFFFF  TTTTT  PPPP
 //   MM MM  O   O  D   D  U   U  L      E           F        T    P   P
@@ -211,9 +258,6 @@ let moduleFTP = async function(mode='trsf') {
 	let dossierFtp = lectYaml.dossierFtp ;
 	let password   = lectYaml.password ;
 
-	// * * * Paramètre fichier * * *
-	let tmpFTP     = path.join(os.tmpdir(),'cmdftp.prm') ; 
-
 	// * * * Lancement FTP * * *
 	let cmdFTP =
 			  "open " + connex.adresse + " \n" +
@@ -237,28 +281,9 @@ let moduleFTP = async function(mode='trsf') {
     cmdFTP += "pwd \n" ; 	
     cmdFTP += "bye "; 		
 
-	fs.writeFileSync(tmpFTP, cmdFTP) ;
-
-	let cmd = "cat '" + tmpFTP + "' | ftp -nv" ; 
-	//cmd = "echo '"+cmd+"'" ;
-	//clog (cmdFTP, cmd) ;
-
-	let cmdResult ;
-	try {
-		cmdResult = require('child_process').execSync(cmd).toString() ;
-		let res = cmdResult.replace(/\n/g, "\r\n").replace(connex.password, "********") ;
-		if (mode == 'test' || visuCR ) {
-			affichageWeb(res, cmdFTP.replace(/\n/g, "\r\n").replace(connex.password, "********")) ;
-		} else {
-		   //clog(res) ;
-		   vscode.window.showInformationMessage(res);
-		}
-	} catch (err) {
-		vscode.window.showErrorMessage('IT-CE : Problème de transfert FTP ! '+cmdResult);
-		clog('err', err) ;
-		return ;
-	}		
-
+	// * * * Envoi de la commande FTP * * *
+		envoiFTP(cmdFTP, connex.password, mode, visuCR) ;
+		
 	// * * * Fin * * *
 	vscode.window.showInformationMessage('Commande de transfert du fichier "'+nomFich+'" executée !');
 
