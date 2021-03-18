@@ -1,18 +1,18 @@
-# boftp README
+# boftp - Le transfert de fichier via FTP.
 
 boFTP, une solution pour transférer un fichier sur un site.
 Le paramétrage étant dans un fichier YAML à la racine (ou la racine en dessous du dépot)..
 
-Seulement une possibilité de transfert de fichier. Pas de création de repertoire.
+C'est seulement une possibilité de transfert de fichier. Pas de création de repertoire.
 
-Une commande pour valider la connexion : Ctrl + shift + p : boFTP-Validation accès FTP    
-Une commande pour faire le transfert : Ctrl + shift + p : boFTP-Transfert de fichier    
+Une commande pour valider la connexion : `Ctrl` + `shift` + `p` : `boFTP-Validation accès FTP`    
+Une commande pour faire le transfert : `Ctrl` + `shift` + `p` : `boFTP-Transfert de fichier`    
 Un menu contextuel permet aussi le transfert
 
 
-Exemple de contenu du fichier de paramétrage : boFTP.yaml :     
-Avec deux connexions possibles pi1 et pi2, et on choisit par le champ "actif"     
-Au premier lancement, il vous demandera le mot de passe du compte qui sera stocké dans un fichier : boFTP.password
+Exemple de contenu du fichier de paramétrage : `boFTP.yaml` :     
+Ici deux connexions possibles `pi1` et `pi2`, et on choisit par le champ `actif`.     
+Au premier lancement, il vous demandera le `mot de passe` du compte actif, ce mot de passe sera stocké dans un fichier : `boFTP.password`.
 
 ```
 comment:         Les connexions FTP
@@ -27,13 +27,18 @@ connexions:
       user:      macelluswallace
       dossier:   /var/www
 ```
-Dans .gitignore, il est utile d'ignorer les fichiers boFTP.*
+
+Dans le fichier `.gitignore`, il sera utile d'ignorer les fichiers `boFTP.*`.
 
 ## Release Notes
 
+### 0.1.0
+
+Première version fonctionnelle.
+
 ### 0.0.4
 
-Gestion du mot de passe
+Gestion du mot de passe.
 
 ### 0.0.3
 

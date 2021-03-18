@@ -123,7 +123,7 @@ let lectureYAML = async function(dirFich) {
 	// * * * Ouverture du fichier YAML * * *
 	let fiYamlCont = fs.readFileSync(fiYaml) ;
 	let connexionList = yaml.safeLoad(fiYamlCont) ; 
-	let connActif = connexionList.actif ; clog(connActif) ;
+	let connActif = connexionList.actif ; 
 	if (connActif == undefined) {
 		vscode.window.showErrorMessage('boFTP - manque le paramètre "actif" dans le fichier "boFTP.yaml" !');
 		clog('connActif undefined') ;
@@ -146,7 +146,6 @@ let lectureYAML = async function(dirFich) {
 	}
 
 	// * * * Retour * * *
-	clog('connex', connex) ;
 	return { retour: true, connex: connex, dossierFtp: dossierFtp, fichierYaml: fiYaml, password: password } ;
 
 }
@@ -172,7 +171,9 @@ let affichageWeb = async function(contenu, cmd) {
 		    , retainContextWhenHidden: false
 			}
 		);
-		panel.webview.html = '<pre>'+cmd+"\n\r\n\r"+contenu+'</pre>' ;
+		let t = '<pre>'+cmd+"\r\n\r\n"+contenu+'</pre>' ;
+		t = t.replace(/\r\n/g, "\r").replace(/\n/g, "\r").replace(/\r/g, "\r\n") ;
+		panel.webview.html = t ;
 }
   
   
@@ -208,9 +209,8 @@ let envoiFTP = function(cmdFTP, password, mode, visuCR) {
 		cmdResult = require('child_process').execSync(cmd).toString() ;
 		let res = cmdResult.replace(/\n/g, "\r\n").replace(password, "********") ;
 		if (mode == 'test' || visuCR ) {
-			affichageWeb(res, fichierCmdFTP.replace(/\n/g, "\r\n").replace(password, "********")) ;
+			affichageWeb(res, cmdFTP.replace(password, "********")) ;
 		} else {
-		//clog(res) ;
 		vscode.window.showInformationMessage(res);
 		}
 	} catch (err) {
@@ -276,13 +276,13 @@ let moduleFTP = async function(mode='trsf') {
 	}
 	if (mode == 'test' || visuCR) {
 		cmdFTP +=
-		 	  "ls \n" ;
+		 	  "ls -l\n" ; 
 	}
     cmdFTP += "pwd \n" ; 	
     cmdFTP += "bye "; 		
 
 	// * * * Envoi de la commande FTP * * *
-		envoiFTP(cmdFTP, connex.password, mode, visuCR) ;
+		envoiFTP(cmdFTP, password, mode, visuCR) ;
 		
 	// * * * Fin * * *
 	vscode.window.showInformationMessage('Commande de transfert du fichier "'+nomFich+'" executée !');
