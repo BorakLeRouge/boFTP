@@ -2,8 +2,9 @@
   "name": "boftp",
   "displayName": "boFTP",
   "description": "Transfert ftp d'élément",
-  "version": "0.0.4",
-	"publisher": "ITCE-MathieuFay",
+  "version": "0.1.0",
+  "publisher": "borakLeRouge",
+  "icon": "iconeBn.png",
   "engines": {
     "vscode": "^1.54.0"
   },
