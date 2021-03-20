@@ -1,30 +1,31 @@
-# boftp - Le transfert de fichier via FTP.
+# boFTP - Le transfert de fichier via FTP.
 
-boFTP, une solution pour transférer un fichier sur un site.
-Le paramétrage étant dans un fichier YAML à la racine (ou la racine en dessous du dépot)..
+boFTP, une solution pour transférer un fichier sur un site.    
+Le paramétrage étant dans un fichier YAML à la racine (ou la racine en dessous du dépot).. 
+Et ce paramètre permet de faire un transfert FTP pour tous les sous-repertoires.
 
-C'est seulement une possibilité de transfert de fichier. Pas de création de repertoire.
+C'est seulement une possibilité de transfert de fichier. Pas de création de repertoire, les nouveaux repertoires seront à créer avec un autre logiciel FTP (fizilla, cyberduck, ...).
 
 Une commande pour valider la connexion : `Ctrl` + `shift` + `p` : `boFTP-Validation accès FTP`    
 Une commande pour faire le transfert : `Ctrl` + `shift` + `p` : `boFTP-Transfert de fichier`    
-Un menu contextuel permet aussi le transfert
+Un menu contextuel permet aussi le transfert : `boFTP-Transfert de fichier`
 
 
 Exemple de contenu du fichier de paramétrage : `boFTP.yaml` :     
-Ici deux connexions possibles `pi1` et `pi2`, et on choisit par le champ `actif`.     
+Ici deux connexions possibles `connex1` et `connex2`, et on choisit par le champ `actif`.     
 Au premier lancement, il vous demandera le `mot de passe` du compte actif, ce mot de passe sera stocké dans un fichier : `boFTP.password`.
 
 ```
 comment:         Les connexions FTP
-actif:           pi1
+actif:           connex1
 connexions:
-    pi1:
+    connex1:
       adresse:   192.168.1.1
       user:      borakLeRouge
       dossier:   /var/www
-    pi2
+    connex2:
       adresse:   192.168.1.1
-      user:      macelluswallace
+      user:      MarcellusWallace
       dossier:   /var/www
 ```
 
