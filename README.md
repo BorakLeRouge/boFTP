@@ -32,9 +32,9 @@ Dans le fichier `.gitignore`, il sera utile d'ignorer les fichiers `boFTP.*`.
 
 ## Release Notes
 
-### 0.1.0
+### 0.1.*
 
-Première version fonctionnelle.
+Première version fonctionnelle avec ses retouches.
 
 ### 0.0.4
 

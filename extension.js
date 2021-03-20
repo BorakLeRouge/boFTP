@@ -207,7 +207,7 @@ let envoiFTP = function(cmdFTP, password, mode, visuCR) {
 	let cmdResult ;
 	try {
 		cmdResult = require('child_process').execSync(cmd).toString() ;
-		let res = cmdResult.replace(/\n/g, "\r\n").replace(password, "********") ;
+		let res = cmdResult.replace(password, "********") ;
 		if (mode == 'test' || visuCR ) {
 			affichageWeb(res, cmdFTP.replace(password, "********")) ;
 		} else {
