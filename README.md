@@ -2,9 +2,9 @@
 
 boFTP, une solution pour transférer un fichier sur un site.    
 Le paramétrage étant dans un fichier YAML à la racine (ou la racine en dessous du dépot).. 
-Et ce paramètre permet de faire un transfert FTP pour tous les sous-repertoires.
+Et ce paramètre unique permet de faire des transferts FTP pour tous les sous-repertoires.
 
-C'est seulement une possibilité de transfert de fichier. Pas de création de repertoire, les nouveaux repertoires seront à créer avec un autre logiciel FTP (fizilla, cyberduck, ...).
+C'est seulement une possibilité de transfert de fichier. Pas de création de repertoire, les nouveaux repertoires seront à créer avec un autre logiciel FTP (FileZilla, Cyberduck, ...).
 
 Une commande pour valider la connexion : `Ctrl` + `shift` + `p` : `boFTP-Validation accès FTP`    
 Une commande pour faire le transfert : `Ctrl` + `shift` + `p` : `boFTP-Transfert de fichier`    
@@ -31,7 +31,17 @@ connexions:
 
 Dans le fichier `.gitignore`, il sera utile d'ignorer les fichiers `boFTP.*`.
 
+Une option de l'extension permet de récupérer le compte-rendu de l'extension lors du transfert (comme pour la vérification ce qui s'effectue automatiquement). Ca peut être utile, mais c'est un peu encombrant. 
+
+## Contraintes
+
+Attention, BoFTP pilote le client FTP en ligne de commande. Si un client FTP n'est pas installé sur votre système, boFTP ne pourra pas marcher. Dans ce cas, il vous faudra installer le client FTP sur votre ordinateur (ce que j'ai fait pour mon Macintosh, car ce n'est plus le cas sur les systèmes récents).
+
 ## Release Notes
+
+### 0.1.2
+
+Amélioration du ReadMe.
 
 ### 0.1.*
 
