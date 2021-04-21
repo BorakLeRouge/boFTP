@@ -41,9 +41,25 @@ Attention, BoFTP pilote le client FTP en ligne de commande. Si un client FTP n'e
 
 ----
 
+## Capture d'écrans
+
+Le fichier paramètre :
+
+![Paramètres](https://raw.githubusercontent.com/BorakLeRouge/boFTP/master/boFTPparam.png)
+
+Le menu de transfert :
+
+![Menu](https://raw.githubusercontent.com/BorakLeRouge/boFTP/master/boFTPmenu.png) 
+
+Le compte-rendu de transfert (optionnel) :
+
+![Compte-rendu](https://raw.githubusercontent.com/BorakLeRouge/boFTP/master/boFTPcr.png) 
+
+----
+
 ## Release Notes
 
-### 0.1.3
+### 0.1.4
 
 Quelques photos d'écran dans le ReadMe.
 

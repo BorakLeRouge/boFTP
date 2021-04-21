@@ -2,7 +2,7 @@
   "name": "boftp",
   "displayName": "boFTP",
   "description": "Transfert ftp d'élément",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "publisher": "borakLeRouge",
   "icon": "iconeBn.png",
   "repository": {
