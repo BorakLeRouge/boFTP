@@ -89,13 +89,14 @@ let recupPassword = async function(adresse, fichierYaml) {
 }  
 
   
-// ==================================================================================================
-//   RRRR   EEEEE   CCC   H   H  EEEEE  RRRR    CCC   H   H  EEEEE       Y   Y   AAA   M   M  L
-//   R   R  E      C   C  H   H  E      R   R  C   C  H   H  E            Y Y   A   A  MM MM  L
-//   RRRR   EEEE   C      HHHHH  EEEE   RRRR   C      HHHHH  EEEE          Y    AAAAA  M M M  L
-//   R  R   E      C   C  H   H  E      R  R   C   C  H   H  E             Y    A   A  M   M  L
-//   R   R  EEEEE   CCC   H   H  EEEEE  R   R   CCC   H   H  EEEEE         Y    A   A  M   M  LLLLL
-// ==================================================================================================
+  
+// ====================================================================================
+//   L      EEEEE   CCC   TTTTT  U   U  RRRR   EEEEE       Y   Y   AAA   M   M  L
+//   L      E      C   C    T    U   U  R   R  E            Y Y   A   A  MM MM  L
+//   L      EEEE   C        T    U   U  RRRR   EEEE          Y    AAAAA  M M M  L
+//   L      E      C   C    T    U   U  R  R   E             Y    A   A  M   M  L
+//   LLLLL  EEEEE   CCC     T     UUU   R   R  EEEEE         Y    A   A  M   M  LLLLL
+// ====================================================================================
 let lectureYAML = async function(dirFich) {
 
 	// * * * Recherche du fichier YAML et alim sous-dossier ftp * * *
@@ -294,6 +295,30 @@ let moduleFTP = async function(mode='trsf') {
 }
 
 
+// =====================================================================================================================================
+//    CCC   H   H   AAA   N   N   GGGG  EEEEE  M   M  EEEEE  N   N  TTTTT       PPPP    AAA    SSSS   SSSS  W   W   OOO   RRRR   DDDD
+//   C   C  H   H  A   A  NN  N  G      E      MM MM  E      NN  N    T         P   P  A   A  S      S      W   W  O   O  R   R  D   D
+//   C      HHHHH  AAAAA  N N N  G  GG  EEEE   M M M  EEEE   N N N    T         PPPP   AAAAA   SSS    SSS   W W W  O   O  RRRR   D   D
+//   C   C  H   H  A   A  N  NN  G   G  E      M   M  E      N  NN    T         P      A   A      S      S  W W W  O   O  R  R   D   D
+//    CCC   H   H  A   A  N   N   GGG   EEEEE  M   M  EEEEE  N   N    T         P      A   A  SSSS   SSSS    W W    OOO   R   R  DDDD
+// =====================================================================================================================================
+  
+
+let changmntPassword = async function() {
+  
+}	
+
+
+
+
+// ==========================================================
+//    AAA    CCC   TTTTT  IIIII  V   V   AAA   TTTTT  EEEEE
+//   A   A  C   C    T      I    V   V  A   A    T    E
+//   AAAAA  C        T      I    V   V  AAAAA    T    EEEE
+//   A   A  C   C    T      I     V V   A   A    T    E
+//   A   A   CCC     T    IIIII    V    A   A    T    EEEEE
+// ==========================================================
+
 /**
  * @param {vscode.ExtensionContext} context
  */
@@ -318,6 +343,11 @@ function activate(context) {
     
 	disposable = vscode.commands.registerCommand('boftp.testFTP', async function () {
 		moduleFTP('test') ;
+	});
+	context.subscriptions.push(disposable);
+
+	disposable = vscode.commands.registerCommand('boftp.chgtPassword', async function () {
+		changmntPassword() ;
 	});
 	context.subscriptions.push(disposable);
     
