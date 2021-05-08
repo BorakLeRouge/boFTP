@@ -7,7 +7,7 @@ Et ce paramètre unique permet de faire des transferts FTP pour tous les sous-re
 C'est seulement une possibilité de transfert de fichier texte. Pas de création de répertoire, les nouveaux repertoires seront à créer avec un autre logiciel FTP (FileZilla, Cyberduck, ...).
 
   
-Un menu contextuel permet de faire le transfert : `boFTP-Transfert de fichier` 
+Un menu contextuel permet de faire le transfert : `boFTP-Transfert de fichier`    
 Une commande pour faire le transfert : `Ctrl` + `shift` + `p` : `boFTP-Transférer le fichier`    
 Une commande pour tester et valider la connexion : `Ctrl` + `shift` + `p` : `boFTP-Valider l'accès FTP`   
 Une commande changer le mot de passe : `Ctrl` + `shift` + `p` : `boFTP-Changer le mot de passe` 
