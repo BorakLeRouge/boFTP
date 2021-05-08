@@ -1,14 +1,16 @@
 # boFTP - Le transfert de fichier via FTP.
 
-boFTP, une solution pour transférer un fichier sur un site.    
-Le paramétrage étant dans un fichier YAML à la racine (ou la racine en dessous du dépot). 
+**boFTP**, une solution pour transférer un fichier sur un site avec la commande terminal FTP.    
+Le paramétrage se fait dans un fichier **YAML** à la racine (ou la racine en dessous du dépot). 
 Et ce paramètre unique permet de faire des transferts FTP pour tous les sous-repertoires.
 
 C'est seulement une possibilité de transfert de fichier texte. Pas de création de répertoire, les nouveaux repertoires seront à créer avec un autre logiciel FTP (FileZilla, Cyberduck, ...).
 
-Une commande pour valider la connexion : `Ctrl` + `shift` + `p` : `boFTP-Validation accès FTP`    
-Une commande pour faire le transfert : `Ctrl` + `shift` + `p` : `boFTP-Transfert de fichier`    
-Un menu contextuel permet aussi le transfert : `boFTP-Transfert de fichier`
+  
+Un menu contextuel permet de faire le transfert : `boFTP-Transfert de fichier` 
+Une commande pour faire le transfert : `Ctrl` + `shift` + `p` : `boFTP-Transférer le fichier`    
+Une commande pour tester et valider la connexion : `Ctrl` + `shift` + `p` : `boFTP-Valider l'accès FTP`   
+Une commande changer le mot de passe : `Ctrl` + `shift` + `p` : `boFTP-Changer le mot de passe` 
 
 
 Exemple de contenu du fichier de paramétrage : `boFTP.yaml` :     
@@ -31,7 +33,7 @@ connexions:
 
 Dans le fichier `.gitignore`, il sera utile d'ignorer les fichiers `boFTP.*`.
 
-Une option de l'extension permet de récupérer le compte-rendu de l'extension lors du transfert (comme pour la vérification ce qui s'effectue automatiquement). Ca peut être utile, mais c'est un peu encombrant. 
+Une option de l'extension permet de récupérer le compte-rendu de l'extension lors du transfert (comme pour la vérification ou le changement de mot de passe, ce qui s'effectue automatiquement). Ca peut être utile, mais c'est un peu encombrant. 
 
 ----
 
@@ -58,6 +60,11 @@ Le compte-rendu de transfert (optionnel) :
 ----
 
 ## Release Notes
+
+### 0.2.0
+
+Ajout d'une commande de changement de mot de passe.
+Modification des libellés des commandes.
 
 ### 0.1.4
 

@@ -63,7 +63,7 @@ function decodPW(t) {
 //   R   R  EEEEE   CCC    UUU   P           P      A   A  SSSS   SSSS    W W    OOO   R   R  DDDD
 // ==================================================================================================
 // a partir du compte, récupération du password (ou demande du password)
-let recupPassword = async function(adresse, fichierYaml) {
+let recupPassword = async function(adresse, fichierYaml, reInit) {
 	let fichierPassword = path.join(path.dirname(fichierYaml), 'boFTP.password') ;
 	let objPassword = {} ;
 	let password = '' ;
@@ -72,7 +72,7 @@ let recupPassword = async function(adresse, fichierYaml) {
 		objPassword = JSON.parse(t);
 		password = objPassword[adresse] ;
 	} 
-	if (password == undefined || password == null || password == '') {
+	if (password == undefined || password == null || password == '' || reInit) {
 		password = '' ;
 		let pass = await vscode.window.showInputBox({ placeHolder: 'Mot de passe', prompt: 'Saisissez votre Mot de Passe Mainframe', password: true});
 		if (pass && pass != '') {
@@ -89,14 +89,15 @@ let recupPassword = async function(adresse, fichierYaml) {
 }  
 
   
-// ==================================================================================================
-//   RRRR   EEEEE   CCC   H   H  EEEEE  RRRR    CCC   H   H  EEEEE       Y   Y   AAA   M   M  L
-//   R   R  E      C   C  H   H  E      R   R  C   C  H   H  E            Y Y   A   A  MM MM  L
-//   RRRR   EEEE   C      HHHHH  EEEE   RRRR   C      HHHHH  EEEE          Y    AAAAA  M M M  L
-//   R  R   E      C   C  H   H  E      R  R   C   C  H   H  E             Y    A   A  M   M  L
-//   R   R  EEEEE   CCC   H   H  EEEEE  R   R   CCC   H   H  EEEEE         Y    A   A  M   M  LLLLL
-// ==================================================================================================
-let lectureYAML = async function(dirFich) {
+  
+// ====================================================================================
+//   L      EEEEE   CCC   TTTTT  U   U  RRRR   EEEEE       Y   Y   AAA   M   M  L
+//   L      E      C   C    T    U   U  R   R  E            Y Y   A   A  MM MM  L
+//   L      EEEE   C        T    U   U  RRRR   EEEE          Y    AAAAA  M M M  L
+//   L      E      C   C    T    U   U  R  R   E             Y    A   A  M   M  L
+//   LLLLL  EEEEE   CCC     T     UUU   R   R  EEEEE         Y    A   A  M   M  LLLLL
+// ====================================================================================
+let lectureYAML = async function(dirFich, reInit) {
 
 	// * * * Recherche du fichier YAML et alim sous-dossier ftp * * *
 	let fi     = dirFich ;
@@ -138,7 +139,7 @@ let lectureYAML = async function(dirFich) {
 	if (connex.dossier == undefined) {connex.dossier = '' ; }
 
 	// * * * Récupération du password * * *
-	let password = await recupPassword(connex.adresse + '-' + connActif, fiYaml, connexionList.actif) ;
+	let password = await recupPassword(connex.adresse + '-' + connActif, fiYaml, reInit) ;
 	if (password == '') {
 		vscode.window.showErrorMessage('boFTP - manque le mot de passe !');
 		clog('password innexistant') ;
@@ -252,7 +253,7 @@ let moduleFTP = async function(mode='trsf') {
 	let dirFich     = path.dirname(adrFich) ;
 
 	// * * * Lecture du fichier YAML
-	let lectYaml = await lectureYAML(dirFich) ;
+	let lectYaml = await lectureYAML(dirFich, mode == 'password') ;
 	if (lectYaml.retour == false) { return ; }
 	let connex     = lectYaml.connex ;
 	let dossierFtp = lectYaml.dossierFtp ;
@@ -274,7 +275,7 @@ let moduleFTP = async function(mode='trsf') {
 		cmdFTP +=
 			  "put \""+ adrFich +"\" \"" + nomFich + "\" \n" ;
 	}
-	if (mode == 'test' || visuCR) {
+	if (mode == 'test' || mode == 'password' || visuCR) {
 		cmdFTP +=
 		 	  "ls -l\n" ; 
 	}
@@ -293,13 +294,18 @@ let moduleFTP = async function(mode='trsf') {
 
 }
 
+// ==========================================================
+//    AAA    CCC   TTTTT  IIIII  V   V   AAA   TTTTT  EEEEE
+//   A   A  C   C    T      I    V   V  A   A    T    E
+//   AAAAA  C        T      I    V   V  AAAAA    T    EEEE
+//   A   A  C   C    T      I     V V   A   A    T    E
+//   A   A   CCC     T    IIIII    V    A   A    T    EEEEE
+// ==========================================================
 
 /**
  * @param {vscode.ExtensionContext} context
  */
 function activate(context) {
-
-	clog('boftp est maintenant Actif !');
 
 	let disposable ;
 
@@ -311,13 +317,21 @@ function activate(context) {
 //   DDDD   EEEEE  BBBB    UUU     T          CCC    OOO   M   M  M   M  A   A  N   N  DDDD   EEEEE  SSSS
 // =========================================================================================================
   
+	// * * * Transfert simple
 	disposable = vscode.commands.registerCommand('boftp.transfertFTP', async function () {
 		moduleFTP() ;
 	});
 	context.subscriptions.push(disposable);
     
+	// * * * Contrôle de la connexion
 	disposable = vscode.commands.registerCommand('boftp.testFTP', async function () {
 		moduleFTP('test') ;
+	});
+	context.subscriptions.push(disposable);
+
+	// * * * Changement du mot de passe et contrôle de la connexion
+	disposable = vscode.commands.registerCommand('boftp.chgtPassword', async function () {
+		moduleFTP('password') ;
 	});
 	context.subscriptions.push(disposable);
     
@@ -328,7 +342,6 @@ function activate(context) {
 //   F        I    N  NN       C   C  O   O  M   M  M   M  A   A  N  NN  D   D  E          S
 //   F      IIIII  N   N        CCC    OOO   M   M  M   M  A   A  N   N  DDDD   EEEEE  SSSS
 // ===========================================================================================
-  
   
 }
 

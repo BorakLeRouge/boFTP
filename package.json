@@ -2,7 +2,7 @@
   "name": "boftp",
   "displayName": "boFTP",
   "description": "Transfert ftp d'élément",
-  "version": "0.1.4",
+  "version": "0.2.0",
   "publisher": "borakLeRouge",
   "icon": "iconeBn.png",
   "repository": {
@@ -17,18 +17,23 @@
   ],
   "activationEvents": [
     "onCommand:boftp.transfertFTP" ,
-    "onCommand:boftp.testFTP"
+    "onCommand:boftp.testFTP",
+    "onCommand:boftp.chgtPassword"
   ],
   "main": "./extension.js",
   "contributes": {
     "commands": [
       {
         "command": "boftp.transfertFTP",
-        "title": "boFTP-Transfert de fichier"
+        "title": "boFTP-Transférer le fichier"
       } ,
       {
         "command": "boftp.testFTP",
-        "title": "boFTP-Validation accès FTP"
+        "title": "boFTP-Valider l'accès FTP"
+      } ,
+      {
+        "command": "boftp.chgtPassword",
+        "title": "boFTP-Changer le mot de passe"
       }
     ],
 		"menus": {
