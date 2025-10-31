@@ -6,21 +6,9 @@ const path   = require('path') ;
 const fs     = require('fs') ;
 const yaml   = require('js-yaml') ;	
 const os     = require('os') ;  
+const { clog } = require('./clog.js') ;
+let   panel ;
 
-// ==============================
-//    CCC   L       OOO    GGGG
-//   C   C  L      O   O  G
-//   C      L      O   O  G  GG
-//   C   C  L      O   O  G   G
-//    CCC   LLLLL   OOO    GGG
-// ==============================
-function clog(...tb) {
-    console.log(tb[0]) ;
-    if (tb.length > 1) { 
-        console.log(tb) ;
-}   }
-
-  
 // ======================================================================
 //    CCC    OOO   DDDD    AAA    GGGG  EEEEE       PPPP   W   W  DDDD
 //   C   C  O   O  D   D  A   A  G      E           P   P  W   W  D   D
@@ -160,69 +148,30 @@ let lectureYAML = async function(dirFich, reInit) {
 // ===========================================================================================
   
 let affichageWeb = async function(contenu, cmd) {
-		// * * * Preparation Panel Web * * *
-		const panel = vscode.window.createWebviewPanel(
-			'Display',
-			'Display',
-			vscode.ViewColumn.One,
-			{
-			  // Enable scripts in the webview
-			  enableScripts: false
-			  // ne réinitialise pas l'affichage HTML
-		    , retainContextWhenHidden: false
-			}
-		);
+		if (panel == undefined) {
+			// * * * Preparation Panel Web * * *
+			panel = vscode.window.createWebviewPanel(
+				'Display',
+				'Display',
+				vscode.ViewColumn.One,
+				{
+				// Enable scripts in the webview
+				enableScripts: false
+				// ne réinitialise pas l'affichage HTML
+				, retainContextWhenHidden: false
+				}
+			);
+			panel.onDidDispose(() => {
+				panel = undefined ;
+			}, null, undefined);
+		}
 		let t = '<pre>'+cmd+"\r\n\r\n"+contenu+'</pre>' ;
 		t = t.replace(/\r\n/g, "\r").replace(/\n/g, "\r").replace(/\r/g, "\r\n") ;
 		panel.webview.html = t ;
+		panel.reveal(vscode.ViewColumn.One); 
 }
   
   
-// ===============================================================
-//   EEEEE  N   N  V   V   OOO   IIIII       FFFFF  TTTTT  PPPP
-//   E      NN  N  V   V  O   O    I         F        T    P   P
-//   EEEE   N N N  V   V  O   O    I         FFFF     T    PPPP
-//   E      N  NN   V V   O   O    I         F        T    P
-//   EEEEE  N   N    V     OOO   IIIII       F        T    P
-// ===============================================================
-// module d'envoi de la commande FTP present dans un fichier 
-let envoiFTP = function(cmdFTP, password, mode, visuCR) {
-
-
-	// * * * Paramètre fichier * * *
-	let fichierCmdFTP = path.join(os.tmpdir(),'cmdftp.prm') ; 
-	
-	let cmd ;
-	if (os.platform().substr(0,3) == 'win') {
-		// * * * Version Windows * * *
-		cmd =  'FTP -n -s:"' + fichierCmdFTP + '"' ; 
-		fichierCmdFTP.replace(/\n/g, "\r\n")
-		fs.writeFileSync(fichierCmdFTP, cmdFTP) ;
-	} else {
-		// * * * Version Macintosh (ou Unix) * * *
-		cmd = "cat '" + fichierCmdFTP + "' | ftp -nv" ; 
-		fichierCmdFTP.replace(/\r\n/g, "\n")
-		fs.writeFileSync(fichierCmdFTP, cmdFTP) ;
-	}
-
-	let cmdResult ;
-	try {
-		cmdResult = require('child_process').execSync(cmd).toString() ;
-		let res = cmdResult.replace(password, "********") ;
-		if (mode == 'test' || visuCR ) {
-			affichageWeb(res, cmdFTP.replace(password, "********")) ;
-		} else {
-		vscode.window.showInformationMessage(res);
-		}
-	} catch (err) {
-		vscode.window.showErrorMessage('IT-CE : Problème de transfert FTP ! '+cmdResult);
-		clog('err', err) ;
-		return  false ;
-	}	
-
-	return  true ;	
-}
-
 // ======================================================================
 //   M   M   OOO   DDDD   U   U  L      EEEEE       FFFFF  TTTTT  PPPP
 //   MM MM  O   O  D   D  U   U  L      E           F        T    P   P
@@ -259,31 +208,45 @@ let moduleFTP = async function(mode='trsf') {
 	let dossierFtp = lectYaml.dossierFtp ;
 	let password   = lectYaml.password ;
 
-	// * * * Lancement FTP * * *
-	let cmdFTP =
-			  "open " + connex.adresse + " \n" +
-			  "user " + connex.user + ' ' + password + " \n" ;
-	if (connex.dossier != '') {
-		cmdFTP +=
-			  "cd \"" + connex.dossier + "\" \n" ;
-	}
-	if (dossierFtp != '') {
-		cmdFTP +=
-			  "cd \"" + dossierFtp + "\" \n" ;
-	}
-	if (mode == 'trsf') {
-		cmdFTP +=
-			  "put \""+ adrFich +"\" \"" + nomFich + "\" \n" ;
-	}
-	if (mode == 'test' || mode == 'password' || visuCR) {
-		cmdFTP +=
-		 	  "ls -l\n" ; 
-	}
-    cmdFTP += "pwd \n" ; 	
-    cmdFTP += "bye "; 		
+	clog('connex', connex.adresse, connex.user, password, dossierFtp, dirFich)
 
-	// * * * Envoi de la commande FTP * * *
-		envoiFTP(cmdFTP, password, mode, visuCR) ;
+	const { Client } = require('basic-ftp');
+
+	const client = new Client()
+    client.ftp.verbose = true ;
+    try {
+		let res = '' ;
+        await client.access({
+            host: 		connex.adresse,
+            user: 		connex.user,
+            password: 	password,
+            secure: 	false
+        })
+		if (connex.dossier != '') {
+			let rt = await client.cd(connex.dossier) ;
+			res += 'cd '+connex.dossier+'\n' + rt.message + '\r\n\r\n' ;
+		}
+		if (dossierFtp != '') {
+			let rt = await client.cd(dossierFtp) ;
+			res += 'cd '+dossierFtp+'\n' + rt.message + '\r\n\r\n' ;
+		}
+		if (mode == 'trsf') {
+			let rt = await client.uploadFrom(adrFich, nomFich) ;
+			res += 'upload '+nomFich+'\n' + rt.message + '\r\n\r\n' ;
+		}
+
+		if (mode == 'test' || visuCR ) {
+			affichageWeb(res, mode)
+		} else {
+			vscode.window.showInformationMessage(res);
+		}
+
+
+    }
+    catch(err) {
+        console.log(err)
+    }
+    client.close()
 		
 	// * * * Fin * * *
 	vscode.window.showInformationMessage('Commande de transfert du fichier "'+nomFich+'" executée !');
