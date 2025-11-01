@@ -224,23 +224,29 @@ let moduleFTP = async function(mode='trsf') {
         })
 		if (connex.dossier != '') {
 			let rt = await client.cd(connex.dossier) ;
-			res += 'cd '+connex.dossier+'\n' + rt.message + '\r\n\r\n' ;
+			res += 'cd '+connex.dossier+"\r\n" + rt.message + "\r\n\r\n" ;
 		}
 		if (dossierFtp != '') {
 			let rt = await client.cd(dossierFtp) ;
-			res += 'cd '+dossierFtp+'\n' + rt.message + '\r\n\r\n' ;
+			res += 'cd '+dossierFtp+"\r\n" + rt.message + "\r\n\r\n" ;
 		}
 		if (mode == 'trsf') {
 			let rt = await client.uploadFrom(adrFich, nomFich) ;
-			res += 'upload '+nomFich+'\n' + rt.message + '\r\n\r\n' ;
+			res += 'upload '+nomFich+"\r\n" + rt.message + "\r\n\r\n" ;
 		}
 
-		if (mode == 'test' || visuCR ) {
+		if (mode == 'test' || mode == 'password' || visuCR ) {
+			let list = await client.list() ; clog('list', list) ;
+			let rt = '' ; 
+			for (let fi of list) {
+				let indic = (fi.isDirectory) ? '[d]' : '   ' ;
+				rt += '-> ' + indic + ' - ' + fi.name + "\r\n" ;
+			}
+			res += 'list '+ "\r\n" + rt + "\r\n" ;
 			affichageWeb(res, mode)
-		} else {
-			vscode.window.showInformationMessage(res);
 		}
-
+		
+		vscode.window.showInformationMessage(res);
 
     }
     catch(err) {
