@@ -1,9 +1,9 @@
 # Change Log
 
-All notable changes to the "boftp" extension will be documented in this file.
+## [V2.0.0]
 
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
+- Utilisation du module npm : basic-ftp pour remplacer la partie terminal
 
-## [Unreleased]
+## [V0.x.x]
 
-- Initial release
+- Première version qui passe du FTP par des commandes terminal.

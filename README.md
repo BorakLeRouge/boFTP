@@ -25,6 +25,7 @@ connexions:
       adresse:   192.168.1.1
       user:      borakLeRouge
       dossier:   /var/www
+      secure:    false
     connex2:
       adresse:   192.168.1.1
       user:      MarcellusWallace
@@ -39,7 +40,7 @@ Une option de l'extension permet de récupérer le compte-rendu de l'extension l
 
 ## Contraintes
 
-Attention, BoFTP pilote le client FTP en ligne de commande. Si un client FTP n'est pas installé sur votre système, boFTP ne pourra pas marcher. Dans ce cas, il vous faudra installer le client FTP sur votre ordinateur (ce que j'ai fait pour mon Macintosh, car ce n'est plus le cas sur certains systèmes récents).
+BoFTP utilise maintenant le module npm basic-ftp pour effectuer les accès FTP.
 
 ----
 
@@ -60,6 +61,12 @@ Le compte-rendu de transfert (optionnel) :
 ----
 
 ## Release Notes
+
+### 2.2.0
+
+Utilisation du module npm 'basic-ftp'.    
+Affichage des accès dans la sortie dédiée.    
+Ajout d'une possibilité de FTPS dans le yaml (paramètre secure).
 
 ### 0.2.0
 
