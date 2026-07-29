@@ -7,41 +7,196 @@ const fs     = require('fs') ;
 const yaml   = require('js-yaml') ;	
 const os     = require('os') ;  
 const { clog } = require('./clog.js') ;
+let   outputMngr ;
 let   panel ;
 
-// ======================================================================
-//    CCC    OOO   DDDD    AAA    GGGG  EEEEE       PPPP   W   W  DDDD
-//   C   C  O   O  D   D  A   A  G      E           P   P  W   W  D   D
-//   C      O   O  D   D  AAAAA  G  GG  EEEE        PPPP   W W W  D   D
-//   C   C  O   O  D   D  A   A  G   G  E           P      W W W  D   D
-//    CCC    OOO   DDDD   A   A   GGG   EEEEE       P       W W   DDDD
-// ======================================================================
-//* Encodage et décodage du password  
-// * * * Encodage utf-8 * * *
-function encodPW(t) {
-	let res = '' ;
-	let prc = 42 ;
-	for(let i in t) {
-		let c   = Number(t.charCodeAt(i)) ; 
-		let cc  = c + prc ; 
-		prc = c ; 
-		if (cc > 255) { cc = cc - 255 ; }
-		res += cc.toString(16) 
-	}
-	return res
+
+// ==========================================================
+//    AAA    CCC   TTTTT  IIIII  V   V   AAA   TTTTT  EEEEE
+//   A   A  C   C    T      I    V   V  A   A    T    E
+//   AAAAA  C        T      I    V   V  AAAAA    T    EEEE
+//   A   A  C   C    T      I     V V   A   A    T    E
+//   A   A   CCC     T    IIIII    V    A   A    T    EEEEE
+// ==========================================================
+
+/**
+ * @param {vscode.ExtensionContext} context
+ */
+function activate(context) {
+
+	let disposable ;
+
+	outputMngr = require('./outputMngr.js') ;
+	outputMngr.setContext(context) ;
+	outputMngr.clear() ;outputMngr.show() ;
+
+// =========================================================================================================
+//   DDDD   EEEEE  BBBB   U   U  TTTTT        CCC    OOO   M   M  M   M   AAA   N   N  DDDD   EEEEE   SSSS
+//   D   D  E      B   B  U   U    T         C   C  O   O  MM MM  MM MM  A   A  NN  N  D   D  E      S
+//   D   D  EEEE   BBBB   U   U    T         C      O   O  M M M  M M M  AAAAA  N N N  D   D  EEEE    SSS
+//   D   D  E      B   B  U   U    T         C   C  O   O  M   M  M   M  A   A  N  NN  D   D  E          S
+//   DDDD   EEEEE  BBBB    UUU     T          CCC    OOO   M   M  M   M  A   A  N   N  DDDD   EEEEE  SSSS
+// =========================================================================================================
+  
+	// * * * Transfert simple
+	disposable = vscode.commands.registerCommand('boftp.transfertFTP', async function () {
+		moduleFTP() ;
+	});
+	context.subscriptions.push(disposable);
+    
+	// * * * Contrôle de la connexion
+	disposable = vscode.commands.registerCommand('boftp.testFTP', async function () {
+		moduleFTP('test') ;
+	});
+	context.subscriptions.push(disposable);
+
+	// * * * Changement du mot de passe et contrôle de la connexion
+	disposable = vscode.commands.registerCommand('boftp.chgtPassword', async function () {
+		moduleFTP('password') ;
+	});
+	context.subscriptions.push(disposable);
+    
+// ===========================================================================================
+//   FFFFF  IIIII  N   N        CCC    OOO   M   M  M   M   AAA   N   N  DDDD   EEEEE   SSSS
+//   F        I    NN  N       C   C  O   O  MM MM  MM MM  A   A  NN  N  D   D  E      S
+//   FFFF     I    N N N       C      O   O  M M M  M M M  AAAAA  N N N  D   D  EEEE    SSS
+//   F        I    N  NN       C   C  O   O  M   M  M   M  A   A  N  NN  D   D  E          S
+//   F      IIIII  N   N        CCC    OOO   M   M  M   M  A   A  N   N  DDDD   EEEEE  SSSS
+// ===========================================================================================
+  
 }
-// * * * Décodage utf-8 * * *
-function decodPW(t) {
-	let res = '' ;
-	let prc = 42 ;
-	for(let i = 0; i < t.length; i+=2) {
-		let v = parseInt(t.substr(i, 2), 16) ; 
-		prc = v - prc ;
-		if (prc < 0) {prc = prc + 255 ; } 
-		res += String.fromCharCode(prc) ; 
-	}
-	return res ;
+
+// this method is called when your extension is deactivated
+function deactivate() {}
+
+module.exports = {
+	activate,
+	deactivate
 }
+
+
+
+// =========================================================================================================================
+//  M   M   OOO   DDD    U   U  L      EEEEE   SSS        DDD    EEEEE       TTTTT  RRRR     A    V   V    A    III  L
+//  MM MM  O   O  D  D   U   U  L      E      S           D  D   E             T    R   R   A A   V   V   A A    I   L
+//  M M M  O   O  D   D  U   U  L      EEE     SSS        D   D  EEE           T    R   R  A   A  V   V  A   A   I   L
+//  M   M  O   O  D   D  U   U  L      E          S       D   D  E             T    RRRR   AAAAA   V V   AAAAA   I   L
+//  M   M  O   O  D  D   U   U  L      E          S       D  D   E             T    R  R   A   A   V V   A   A   I   L
+//  M   M   OOO   DDD     UUU   LLLLL  EEEEE  SSSS        DDD    EEEEE         T    R   R  A   A    V    A   A  III  LLLLL
+// =========================================================================================================================
+// * * * Modules de Travail
+
+
+
+  
+  
+// ======================================================================
+//   M   M   OOO   DDDD   U   U  L      EEEEE       FFFFF  TTTTT  PPPP
+//   MM MM  O   O  D   D  U   U  L      E           F        T    P   P
+//   M M M  O   O  D   D  U   U  L      EEEE        FFFF     T    PPPP
+//   M   M  O   O  D   D  U   U  L      E           F        T    P
+//   M   M   OOO   DDDD    UUU   LLLLL  EEEEE       F        T    P
+// ======================================================================
+  
+  
+let moduleFTP = async function(mode='trsf') {
+	outputMngr.clear() ;
+
+	// * * * Récupération Paramètre extension * * *
+	let configuration  = vscode.workspace.getConfiguration('boFTP') ;
+	let visuCR         = configuration.CompteRenduText ;
+	
+	// * * * Information du fichier en cours * * *
+	let textEdit    = vscode.window.activeTextEditor ;
+	let uri         = vscode.window.activeTextEditor.document.uri
+	if (textEdit == undefined) {
+		vscode.window.showErrorMessage('boFTP - Vous ne n\'êtes pas sur un fichier en édition !');
+		outputMngr.affich('Vous ne n\'êtes pas sur un fichier en édition !') ;
+		return ;	
+	}
+	if (textEdit.document.isDirty || textEdit.document.isUntitled) {
+		vscode.window.showErrorMessage('boFTP - Vous n\'avez pas sauvegardé votre fichier !');
+		outputMngr.affich('Vous n\'avez pas sauvegardé votre fichier !') ;
+		return ;
+	}
+	let adrFich     = textEdit.document.fileName ;
+	let nomFich     = path.basename(adrFich) ; 
+	let dirFich     = path.dirname(adrFich) ;
+	outputMngr.affich("\r\n- " + 'Dossier : ' + dirFich + "\r\n- " + 'Fichier : ' + nomFich) ;
+
+	if (nomFich.substring(0, 17) == 'extension-output-') {
+		vscode.window.showErrorMessage('boFTP - Vous ne n\'êtes pas sur un fichier en édition ! Mais sur la sortie');
+		outputMngr.affich('Vous ne n\'êtes pas sur un fichier en édition ! Mais sur la sortie') ;
+		return ;	
+	}
+	// * * * Lecture du fichier YAML
+	let lectYaml = await lectureYAML(dirFich, mode == 'password') ;
+	if (lectYaml.retour == false) { return ; }
+	let connex     = lectYaml.connex ;
+	let dossierFtp = lectYaml.dossierFtp ;
+	let password   = lectYaml.password ;
+	let secure     = lectYaml.secure ;
+	if (secure == undefined) { secure = false ; }	
+
+	clog('connex', connex.adresse, connex.user, password, dossierFtp, dirFich)
+
+	const { Client } = require('basic-ftp');
+
+	const client = new Client()
+    client.ftp.verbose = true ;
+    try {
+		let res = '' ;
+        await client.access({
+            host: 		connex.adresse,
+            user: 		connex.user,
+            password: 	password,
+            secure: 	secure
+        })
+		if (connex.dossier != '') {
+			let rt = await client.cd(connex.dossier) ;
+			res += 'cd '+connex.dossier+"\r\n" + rt.message + "\r\n\r\n" ;
+		}
+		if (dossierFtp != '') {
+			let rt = await client.cd(dossierFtp) ;
+			res += 'cd '+dossierFtp+"\r\n" + rt.message + "\r\n\r\n" ;
+		}
+		if (mode == 'trsf') {
+			let rt = await client.uploadFrom(adrFich, nomFich) ;
+			res += 'upload '+nomFich+"\r\n" + rt.message + "\r\n\r\n" ;
+		}
+
+		if (mode == 'test' || mode == 'password' || visuCR ) {
+			let list = await client.list() ; clog('list', list) ;
+			let rt = '' ; 
+			for (let fi of list) {
+				let indic = (fi.isDirectory) ? '[d]' : '   ' ;
+				rt += '-> ' + indic + ' - ' + fi.name + "\r\n" ;
+			}
+			res += 'list '+ "\r\n" + rt + "\r\n" ;
+			outputMngr.show() ;
+			outputMngr.affich('Resultat commande FTP : \r\n' + res) ;
+		}
+
+		vscode.window.showTextDocument(uri) ;
+
+    }
+    catch(err) {
+		clog('err', err) ;
+        outputMngr.affich(err)
+    }
+    client.close()
+		
+	// * * * Fin * * *
+	if (mode == 'trsf') {
+		vscode.window.showInformationMessage('Commande de transfert du fichier "'+nomFich+'" executée !');
+	}
+
+	clog('* * * * nickel * * * *') ;
+
+	return
+
+}
+
 
 // ==================================================================================================
 //   RRRR   EEEEE   CCC   U   U  PPPP        PPPP    AAA    SSSS   SSSS  W   W   OOO   RRRR   DDDD
@@ -105,7 +260,7 @@ let lectureYAML = async function(dirFich, reInit) {
 	// * * * controle présence YAML * * *
 	if (fiYaml == '') {
 		vscode.window.showErrorMessage('boFTP - désolé : fichier "boFTP.yaml" non trouvé !');
-		clog('Yaml non trouvé !') ;
+		outputMngr.affich('Yaml non trouvé !') ;
 		return { retour: false };
 	}
 
@@ -115,13 +270,13 @@ let lectureYAML = async function(dirFich, reInit) {
 	let connActif = connexionList.actif ; 
 	if (connActif == undefined) {
 		vscode.window.showErrorMessage('boFTP - manque le paramètre "actif" dans le fichier "boFTP.yaml" !');
-		clog('connActif undefined') ;
+		outputMngr.affich('Yaml non décodé !') ;
 		return { retour: false };
 	}
 	let connex = connexionList.connexions[connActif] ;
 	if (connex == undefined || connex.adresse == undefined || connex.user == undefined) {
 		vscode.window.showErrorMessage('boFTP - fichier "boFTP.yaml" non conforme !');
-		clog('connex', connex) ;
+		outputMngr.affich('connex', connex) ;
 		return { retour: false };
 	}
 	if (connex.dossier == undefined) {connex.dossier = '' ; }
@@ -130,7 +285,7 @@ let lectureYAML = async function(dirFich, reInit) {
 	let password = await recupPassword(connex.adresse + '-' + connActif, fiYaml, reInit) ;
 	if (password == '') {
 		vscode.window.showErrorMessage('boFTP - manque le mot de passe !');
-		clog('password innexistant') ;
+		outputMngr.affich('password innexistant') ;
 		return { retour: false }
 	}
 
@@ -138,186 +293,37 @@ let lectureYAML = async function(dirFich, reInit) {
 	return { retour: true, connex: connex, dossierFtp: dossierFtp, fichierYaml: fiYaml, password: password } ;
 
 }
-  
-// ===========================================================================================
-//    AAA   FFFFF  FFFFF  IIIII   CCC   H   H   AAA    GGGG  EEEEE       W   W  EEEEE  BBBB
-//   A   A  F      F        I    C   C  H   H  A   A  G      E           W   W  E      B   B
-//   AAAAA  FFFF   FFFF     I    C      HHHHH  AAAAA  G  GG  EEEE        W W W  EEEE   BBBB
-//   A   A  F      F        I    C   C  H   H  A   A  G   G  E           W W W  E      B   B
-//   A   A  F      F      IIIII   CCC   H   H  A   A   GGG   EEEEE        W W   EEEEE  BBBB
-// ===========================================================================================
-  
-let affichageWeb = async function(contenu, cmd) {
-		if (panel == undefined) {
-			// * * * Preparation Panel Web * * *
-			panel = vscode.window.createWebviewPanel(
-				'Display',
-				'Display',
-				vscode.ViewColumn.One,
-				{
-				// Enable scripts in the webview
-				enableScripts: false
-				// ne réinitialise pas l'affichage HTML
-				, retainContextWhenHidden: false
-				}
-			);
-			panel.onDidDispose(() => {
-				panel = undefined ;
-			}, null, undefined);
-		}
-		let t = '<pre>'+cmd+"\r\n\r\n"+contenu+'</pre>' ;
-		t = t.replace(/\r\n/g, "\r").replace(/\n/g, "\r").replace(/\r/g, "\r\n") ;
-		panel.webview.html = t ;
-		panel.reveal(vscode.ViewColumn.One); 
-}
-  
-  
+
 // ======================================================================
-//   M   M   OOO   DDDD   U   U  L      EEEEE       FFFFF  TTTTT  PPPP
-//   MM MM  O   O  D   D  U   U  L      E           F        T    P   P
-//   M M M  O   O  D   D  U   U  L      EEEE        FFFF     T    PPPP
-//   M   M  O   O  D   D  U   U  L      E           F        T    P
-//   M   M   OOO   DDDD    UUU   LLLLL  EEEEE       F        T    P
+//    CCC    OOO   DDDD    AAA    GGGG  EEEEE       PPPP   W   W  DDDD
+//   C   C  O   O  D   D  A   A  G      E           P   P  W   W  D   D
+//   C      O   O  D   D  AAAAA  G  GG  EEEE        PPPP   W W W  D   D
+//   C   C  O   O  D   D  A   A  G   G  E           P      W W W  D   D
+//    CCC    OOO   DDDD   A   A   GGG   EEEEE       P       W W   DDDD
 // ======================================================================
-  
-  
-let moduleFTP = async function(mode='trsf') {
-
-	// * * * Récupération Paramètre extension * * *
-	let configuration  = vscode.workspace.getConfiguration('boFTP') ;
-	let visuCR         = configuration.CompteRenduText ;
-	
-	// * * * Information du fichier en cours * * *
-	let textEdit    = vscode.window.activeTextEditor ;
-	if (textEdit == undefined) {
-		vscode.window.showErrorMessage('boFTP - Vous ne n\'êtes pas sur un fichier en édition !');
-		return ;	
+//* Encodage et décodage du password  
+// * * * Encodage utf-8 * * *
+function encodPW(t) {
+	let res = '' ;
+	let prc = 42 ;
+	for(let i in t) {
+		let c   = Number(t.charCodeAt(i)) ; 
+		let cc  = c + prc ; 
+		prc = c ; 
+		if (cc > 255) { cc = cc - 255 ; }
+		res += cc.toString(16) 
 	}
-	if (textEdit.document.isDirty || textEdit.document.isUntitled) {
-		vscode.window.showErrorMessage('boFTP - Vous n\'avez pas sauvegardé votre fichier !');
-		return ;
+	return res
+}
+// * * * Décodage utf-8 * * *
+function decodPW(t) {
+	let res = '' ;
+	let prc = 42 ;
+	for(let i = 0; i < t.length; i+=2) {
+		let v = parseInt(t.substr(i, 2), 16) ; 
+		prc = v - prc ;
+		if (prc < 0) {prc = prc + 255 ; } 
+		res += String.fromCharCode(prc) ; 
 	}
-	let adrFich     = textEdit.document.fileName ;
-	let nomFich     = path.basename(adrFich) ; 
-	let dirFich     = path.dirname(adrFich) ;
-
-	// * * * Lecture du fichier YAML
-	let lectYaml = await lectureYAML(dirFich, mode == 'password') ;
-	if (lectYaml.retour == false) { return ; }
-	let connex     = lectYaml.connex ;
-	let dossierFtp = lectYaml.dossierFtp ;
-	let password   = lectYaml.password ;
-
-	clog('connex', connex.adresse, connex.user, password, dossierFtp, dirFich)
-
-	const { Client } = require('basic-ftp');
-
-	const client = new Client()
-    client.ftp.verbose = true ;
-    try {
-		let res = '' ;
-        await client.access({
-            host: 		connex.adresse,
-            user: 		connex.user,
-            password: 	password,
-            secure: 	false
-        })
-		if (connex.dossier != '') {
-			let rt = await client.cd(connex.dossier) ;
-			res += 'cd '+connex.dossier+"\r\n" + rt.message + "\r\n\r\n" ;
-		}
-		if (dossierFtp != '') {
-			let rt = await client.cd(dossierFtp) ;
-			res += 'cd '+dossierFtp+"\r\n" + rt.message + "\r\n\r\n" ;
-		}
-		if (mode == 'trsf') {
-			let rt = await client.uploadFrom(adrFich, nomFich) ;
-			res += 'upload '+nomFich+"\r\n" + rt.message + "\r\n\r\n" ;
-		}
-
-		if (mode == 'test' || mode == 'password' || visuCR ) {
-			let list = await client.list() ; clog('list', list) ;
-			let rt = '' ; 
-			for (let fi of list) {
-				let indic = (fi.isDirectory) ? '[d]' : '   ' ;
-				rt += '-> ' + indic + ' - ' + fi.name + "\r\n" ;
-			}
-			res += 'list '+ "\r\n" + rt + "\r\n" ;
-			affichageWeb(res, mode)
-		}
-		
-		vscode.window.showInformationMessage(res);
-
-    }
-    catch(err) {
-        console.log(err)
-    }
-    client.close()
-		
-	// * * * Fin * * *
-	vscode.window.showInformationMessage('Commande de transfert du fichier "'+nomFich+'" executée !');
-
-	clog('* * * * nickel * * * *') ;
-
-	return
-
-}
-
-// ==========================================================
-//    AAA    CCC   TTTTT  IIIII  V   V   AAA   TTTTT  EEEEE
-//   A   A  C   C    T      I    V   V  A   A    T    E
-//   AAAAA  C        T      I    V   V  AAAAA    T    EEEE
-//   A   A  C   C    T      I     V V   A   A    T    E
-//   A   A   CCC     T    IIIII    V    A   A    T    EEEEE
-// ==========================================================
-
-/**
- * @param {vscode.ExtensionContext} context
- */
-function activate(context) {
-
-	let disposable ;
-
-// =========================================================================================================
-//   DDDD   EEEEE  BBBB   U   U  TTTTT        CCC    OOO   M   M  M   M   AAA   N   N  DDDD   EEEEE   SSSS
-//   D   D  E      B   B  U   U    T         C   C  O   O  MM MM  MM MM  A   A  NN  N  D   D  E      S
-//   D   D  EEEE   BBBB   U   U    T         C      O   O  M M M  M M M  AAAAA  N N N  D   D  EEEE    SSS
-//   D   D  E      B   B  U   U    T         C   C  O   O  M   M  M   M  A   A  N  NN  D   D  E          S
-//   DDDD   EEEEE  BBBB    UUU     T          CCC    OOO   M   M  M   M  A   A  N   N  DDDD   EEEEE  SSSS
-// =========================================================================================================
-  
-	// * * * Transfert simple
-	disposable = vscode.commands.registerCommand('boftp.transfertFTP', async function () {
-		moduleFTP() ;
-	});
-	context.subscriptions.push(disposable);
-    
-	// * * * Contrôle de la connexion
-	disposable = vscode.commands.registerCommand('boftp.testFTP', async function () {
-		moduleFTP('test') ;
-	});
-	context.subscriptions.push(disposable);
-
-	// * * * Changement du mot de passe et contrôle de la connexion
-	disposable = vscode.commands.registerCommand('boftp.chgtPassword', async function () {
-		moduleFTP('password') ;
-	});
-	context.subscriptions.push(disposable);
-    
-// ===========================================================================================
-//   FFFFF  IIIII  N   N        CCC    OOO   M   M  M   M   AAA   N   N  DDDD   EEEEE   SSSS
-//   F        I    NN  N       C   C  O   O  MM MM  MM MM  A   A  NN  N  D   D  E      S
-//   FFFF     I    N N N       C      O   O  M M M  M M M  AAAAA  N N N  D   D  EEEE    SSS
-//   F        I    N  NN       C   C  O   O  M   M  M   M  A   A  N  NN  D   D  E          S
-//   F      IIIII  N   N        CCC    OOO   M   M  M   M  A   A  N   N  DDDD   EEEEE  SSSS
-// ===========================================================================================
-  
-}
-
-// this method is called when your extension is deactivated
-function deactivate() {}
-
-module.exports = {
-	activate,
-	deactivate
+	return res ;
 }

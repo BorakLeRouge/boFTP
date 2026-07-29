@@ -2,7 +2,7 @@
   "name": "boftp",
   "displayName": "boFTP",
   "description": "Transfert ftp d'élément",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "publisher": "borakLeRouge",
   "icon": "iconeBn.png",
   "repository": {
@@ -67,12 +67,12 @@
     "@types/vscode": "^1.54.0",
     "eslint": "^7.19.0",
     "glob": "^7.1.6",
-    "mocha": "^11.7.4",
+    "mocha": "^11.3.0",
     "typescript": "^4.1.3",
-    "vscode-test": "^1.5.0"
+    "vscode-test": "^1.4.1"
   },
   "dependencies": {
-    "basic-ftp": "^5.0.5",
+    "basic-ftp": "^6.0.2",
     "js-yaml": "^3.13.1"
   }
 }
